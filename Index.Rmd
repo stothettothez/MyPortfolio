@@ -1,0 +1,50 @@
+---
+title: "Portfolio for Computational Musicology"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    theme: flatly
+---
+
+```{r setup}
+library(flexdashboard)
+library(tidyverse)
+library(plotly)
+library(spotifyr)
+source('spotify.R')
+```
+
+### Title. Make it long and interesting, think like a journalist.
+
+This is introductory text, here goes code for visualizations or boring text. 
+The plots you need to give a name and put in the command ggplotly() -> The plot becomes interactive. 
+
+***
+
+This is the text in the right side piece. This is the place for your description.
+
+### This is the second piece of story, also use a long title here. 
+
+
+
+### Chart A
+
+```{r}
+
+```
+
+Column {data-width=350}
+-----------------------------------------------------------------------
+
+### Chart B
+
+```{r}
+
+```
+
+### Chart C
+
+```{r}
+
+```
+
