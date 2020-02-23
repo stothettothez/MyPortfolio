@@ -6,45 +6,718 @@ output:
     theme: flatly
 ---
 
-```{r setup}
+```{r setup, include = FALSE}
 library(flexdashboard)
+library(ggplot2)
 library(tidyverse)
 library(plotly)
 library(spotifyr)
+library(knitr)
+library(dplyr)
+library(DT)
 source('spotify.R')
+
+orchestre_revolutionaire <- get_playlist_audio_features('1141098859','347dGAMO2gQzaxr504Ttud')
+berliner_philharmoniker <- get_playlist_audio_features('1141098859','3bimpGCxSbRINVKc6aQyoh')
+andre_cuytens <- get_playlist_audio_features('1141098859', '16FHN0e9eWfg5YlogkmQMs')
+sarah_walker <- get_playlist_audio_features('1141098859','3Qra4jxbMOy7kYGKsdsB7o')  
+gustavo_dudamel <- get_playlist_audio_features('1141098859','5bjL9CcLUQyQcvymaU1dxQ')  
+wiener_philharmoniker <- get_playlist_audio_features('1141098859','2T9M3y7wDTwObvFAtZIGMX')
+arturo_toscanini <- get_playlist_audio_features('1141098859', '6LuvCRwpazgZnEQdoX1GMx')
+jonas_ferencsik <- get_playlist_audio_features('1141098859', '6kgHWtoqEcgV1dqS8fXD5k')
+london_symphony <- get_playlist_audio_features('1141098859', '2hx5evxDYNRuqkEDsMD5ej')
+zagreb_philharmonic <- get_playlist_audio_features('1141098859', '4vf5TOi8Fs7qFXAJpmf4r8')
+jananeck_opera <- get_playlist_audio_features('1141098859', '5MsFcLouvQy1fMqnmOcXgY')
+orquesta_sinfonica_mineria <- get_playlist_audio_features('1141098859', '0W9cNcv2RXH7LW37GLVzi6')
+berliner_philharmoniker_herbert <- get_playlist_audio_features('1141098859', '4enmLYKj4fx6TnCZf28T0u')
+wilhelm_furtwangler <- get_playlist_audio_features('1141098859', '2aJJw1xmMgcraWwEHrfZGv')
+gewandhausorchester_leipzig <- get_playlist_audio_features('1141098859', '7daV0WpdKEtdn8DTa5LC0n')
+nikolaus_harnoncourt <- get_playlist_audio_features('1141098859', '1FQ6UsyIllrTBYEL2R38ak')
+simon_rattle <- get_playlist_audio_features('1141098859', '3thu0yETz8Za3Jjiuo2Dp9')
+tafelmusik_baroque_orchestra <- get_playlist_audio_features('1141098859', '3UOqUbXwhTTqFJkHyUWSXC')
+berliner_philharmoniker_herbert2 <- get_playlist_audio_features('1141098859', '5EzeZ0g58pHsNdgRZL9xUI')
+janet_perry <- get_playlist_audio_features('1141098859', '5uKM9GBBuK3Cjf5FDUciwI')
+bavarian_radio_symphony_orchestra <- get_playlist_audio_features('1141098859', '6c2Fw3htiX9sDzKXnYAzMJ')
+wiener_philharmoniker_leonard <- get_playlist_audio_features('1141098859', '5r3ZHdGXNfqsSj3q2alBvT')
+hans_schmidt_isserstedt <- get_playlist_audio_features('1141098859', '2sp5EEW8ewujJlWOxol1fa')
+herbert_von_karajan <- get_playlist_audio_features('1141098859', '1uwc5pLXUqbnyUrHkcncSe')
+simon_rattle2 <- get_playlist_audio_features('1141098859', '5DSgd7mOgKo9QIH4vbqrgd')
+concertgebouworkest <- get_playlist_audio_features('1141098859', '0k8Ke8s3665Id7n5gwk3fu')
+royal_liverpool_orchestra_charles_mackerras <- get_playlist_audio_features('1141098859', '0w51R2CljWexXVHBagYOMK')
+wolfgang_sawallisch <- get_playlist_audio_features('1141098859', '6n1dB3zAp4bcg5BaufiP3n')
+cyprien_katsaris <- get_playlist_audio_features('1141098859', '4gl2sXKTvU0CGreeJlxYkj')
+bach_collegium_japan <- get_playlist_audio_features('1141098859', '1XYaofQPIlht5CSyY5vl9h')
+philharmonia_orchestra_herbert <- get_playlist_audio_features('1141098859', '6SY4ifFaf34ZnFdGmEzt8R')
+wiener_philharmoniker_andris_nelsons <- get_playlist_audio_features('1141098859', '0lKqmP21ypHnkyH5F9Njvs')
+london_symphony_orchestra_bernard_haitink <- get_playlist_audio_features('1141098859', '0Xe0HkD5HI3tbz7DX19EFr')
+orchestra_18thcentury <- get_playlist_audio_features('1141098859', '0UN7VhSdubdp8meu4oNnqU')
+osmo_vanska <- get_playlist_audio_features('1141098859', '1gCTc7lYQb80NXNJjXHiHr')
+london_symphony_orchestra_josef_krips <- get_playlist_audio_features('1141098859', '62Mep24jZJWqykd4EwNZbI')
+
+All_symphonies <- bind_rows(orchestre_revolutionaire, 
+                            berliner_philharmoniker, 
+                            andre_cuytens, 
+                            sarah_walker, 
+                            gustavo_dudamel, 
+                            wiener_philharmoniker, 
+                            arturo_toscanini, 
+                            jonas_ferencsik, 
+                            london_symphony, 
+                            zagreb_philharmonic, 
+                            jananeck_opera, 
+                            orquesta_sinfonica_mineria, 
+                            berliner_philharmoniker_herbert, 
+                            wilhelm_furtwangler, 
+                            gewandhausorchester_leipzig, 
+                            nikolaus_harnoncourt, 
+                            simon_rattle, 
+                            tafelmusik_baroque_orchestra, 
+                            berliner_philharmoniker_herbert2, 
+                            janet_perry, 
+                            bavarian_radio_symphony_orchestra, 
+                            wiener_philharmoniker_leonard, 
+                            hans_schmidt_isserstedt, 
+                            herbert_von_karajan, 
+                            simon_rattle2, 
+                            concertgebouworkest, 
+                            london_symphony_orchestra_bernard_haitink, 
+                            orchestra_18thcentury, 
+                            osmo_vanska, 
+                            london_symphony_orchestra_josef_krips)
+all_symphonies_grouped <- group_by(All_symphonies, playlist_name)
+
+#orchestre revolutionaire:
+orchestre_revolutionaire_danceability <- orchestre_revolutionaire %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+orchestre_revolutionaire_energy <- orchestre_revolutionaire %>%  summarize(M_energy = mean(energy), SD_energy = sd(energy))
+orchestre_revolutionaire_loudness <- orchestre_revolutionaire %>%  summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+orchestre_revolutionaire_tempo <- orchestre_revolutionaire %>%  summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#berliner philharmoniker
+berliner_philharmoniker_danceability <- berliner_philharmoniker %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+berliner_philharmoniker_energy <- berliner_philharmoniker %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+berliner_philharmoniker_loudness <- berliner_philharmoniker %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+berliner_philharmoniker_tempo <- berliner_philharmoniker %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#andre cuytens
+andre_cuytens_danceability <- andre_cuytens %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+andre_cuytens_danceability
+andre_cuytens_energy <- andre_cuytens %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+andre_cuytens_loudness <- andre_cuytens %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+andre_cuytens_tempo <- andre_cuytens %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#sarah walker
+sarah_walker_danceability <- sarah_walker %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+sarah_walker_danceability
+sarah_walker_energy <- sarah_walker %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+sarah_walker_loudness <- sarah_walker %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+sarah_walker_tempo <- sarah_walker %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#gustavo dudamel
+gustavo_dudamel_danceability <- gustavo_dudamel %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+gustavo_dudamel_danceability
+gustavo_dudamel_energy <- gustavo_dudamel %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+gustavo_dudamel_loudness <- gustavo_dudamel %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+gustavo_dudamel_tempo <- gustavo_dudamel %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#wiener philharmoniker
+wiener_philharmoniker_danceability <- wiener_philharmoniker %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+wiener_philharmoniker_danceability
+wiener_philharmoniker_energy <- wiener_philharmoniker %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+wiener_philharmoniker_loudness <- wiener_philharmoniker %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+wiener_philharmoniker_tempo <- wiener_philharmoniker %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#arturo toscanini
+arturo_toscanini_danceability <- arturo_toscanini %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+arturo_toscanini_danceability
+arturo_toscanini_energy <- arturo_toscanini %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+arturo_toscanini_loudness <- arturo_toscanini %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+arturo_toscanini_tempo <- arturo_toscanini %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#jonas ferencsik
+jonas_ferencsik_danceability <- jonas_ferencsik %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+jonas_ferencsik_danceability
+jonas_ferencsik_energy <- jonas_ferencsik %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+jonas_ferencsik_loudness <- jonas_ferencsik %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+jonas_ferencsik_tempo <- jonas_ferencsik %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#london symphony
+london_symphony_danceability <- london_symphony %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+london_symphony_energy <- london_symphony %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+london_symphony_loudness <- london_symphony %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+london_symphony_tempo <- london_symphony %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#zagreb philharmonic
+zagreb_philharmonic_danceability <- zagreb_philharmonic %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+zagreb_philharmonic_energy <- zagreb_philharmonic %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+zagreb_philharmonic_loudness <- zagreb_philharmonic %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+zagreb_philharmonic_tempo <- zagreb_philharmonic %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#jananeck opera
+jananeck_opera_danceability <- jananeck_opera %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+jananeck_opera_energy <- jananeck_opera %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+jananeck_opera_loudness <- jananeck_opera %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+jananeck_opera_tempo <- jananeck_opera %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#orquesta sinfonica mineria
+orquesta_sinfonica_mineria_danceability <- orquesta_sinfonica_mineria %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+orquesta_sinfonica_mineria_energy <- orquesta_sinfonica_mineria %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+orquesta_sinfonica_mineria_loudness <- orquesta_sinfonica_mineria %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+orquesta_sinfonica_mineria_tempo <- orquesta_sinfonica_mineria %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#berliner philharmoniker herbert
+berliner_philharmoniker_herbert_danceability <- berliner_philharmoniker_herbert %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+berliner_philharmoniker_herbert_energy <- berliner_philharmoniker_herbert %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+berliner_philharmoniker_herbert_loudness <- berliner_philharmoniker_herbert %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+berliner_philharmoniker_herbert_tempo <- berliner_philharmoniker_herbert %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#wilhelm furtwangler
+wilhelm_furtwangler_danceability <- wilhelm_furtwangler %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+wilhelm_furtwangler_energy <- wilhelm_furtwangler %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+wilhelm_furtwangler_loudness <- wilhelm_furtwangler %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+wilhelm_furtwangler_tempo <- wilhelm_furtwangler %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#gewandhausorchester Leipzig
+gewandhausorchester_leipzig_danceability <- gewandhausorchester_leipzig %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+gewandhausorchester_leipzig_energy <- gewandhausorchester_leipzig %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+gewandhausorchester_leipzig_loudness <- gewandhausorchester_leipzig %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+gewandhausorchester_leipzig_tempo <- gewandhausorchester_leipzig %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#nikolaus harnoncourt
+nikolaus_harnoncourt_danceability <- nikolaus_harnoncourt %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+nikolaus_harnoncourt_energy <- nikolaus_harnoncourt %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+nikolaus_harnoncourt_loudness <- nikolaus_harnoncourt %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+nikolaus_harnoncourt_tempo <- nikolaus_harnoncourt %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#simon rattle
+simon_rattle_danceability <- simon_rattle %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+simon_rattle_energy <- simon_rattle %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+simon_rattle_loudness <- simon_rattle %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+simon_rattle_tempo <- simon_rattle %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#tafelmusik baroque orchestra
+tafelmusik_baroque_orchestra_danceability <- tafelmusik_baroque_orchestra %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+tafelmusik_baroque_orchestra_energy <- tafelmusik_baroque_orchestra %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+tafelmusik_baroque_orchestra_loudness <- tafelmusik_baroque_orchestra %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+tafelmusik_baroque_orchestra_tempo <- tafelmusik_baroque_orchestra %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#berliner philharmoniker herbert 2
+berliner_philharmoniker_herbert2_danceability <- berliner_philharmoniker_herbert2 %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+berliner_philharmoniker_herbert2_energy <- berliner_philharmoniker_herbert2 %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+berliner_philharmoniker_herbert2_loudness <- berliner_philharmoniker_herbert2 %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+berliner_philharmoniker_herbert2_tempo <- berliner_philharmoniker_herbert2 %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#janet perry
+janet_perry_danceability <- janet_perry %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+janet_perry_energy <- janet_perry %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+janet_perry_loudness <- janet_perry %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+janet_perry_tempo <- janet_perry %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#bavarian radio symphony orchestra
+bavarian_radio_symphony_orchestra_danceability <- bavarian_radio_symphony_orchestra %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+bavarian_radio_symphony_orchestra_energy <- bavarian_radio_symphony_orchestra %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+bavarian_radio_symphony_orchestra_loudness <- bavarian_radio_symphony_orchestra %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+bavarian_radio_symphony_orchestra_tempo <- bavarian_radio_symphony_orchestra %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#wiener philharmoniker leonard
+wiener_philharmoniker_leonard_danceability <- wiener_philharmoniker_leonard %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+wiener_philharmoniker_leonard_energy <- wiener_philharmoniker_leonard %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+wiener_philharmoniker_leonard_loudness <- wiener_philharmoniker_leonard %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+wiener_philharmoniker_leonard_tempo <- wiener_philharmoniker_leonard %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#hans schmidt isserstedt
+hans_schmidt_isserstedt_danceability <- hans_schmidt_isserstedt %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+hans_schmidt_isserstedt_energy <- hans_schmidt_isserstedt %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+hans_schmidt_isserstedt_loudness <- hans_schmidt_isserstedt %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+hans_schmidt_isserstedt_tempo <- hans_schmidt_isserstedt %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#herbert von karajan
+herbert_von_karajan_danceability <- herbert_von_karajan %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+herbert_von_karajan_energy <- herbert_von_karajan %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+herbert_von_karajan_loudness <- herbert_von_karajan %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+herbert_von_karajan_tempo <- herbert_von_karajan %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#simon rattle 2
+simon_rattle2_danceability <- simon_rattle2 %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+simon_rattle2_energy <- simon_rattle2 %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+simon_rattle2_loudness <- simon_rattle2 %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+simon_rattle2_tempo <- simon_rattle2 %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#concertgebouworkest
+concertgebouworkest_danceability <- concertgebouworkest %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+concertgebouworkest_energy <- concertgebouworkest %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+concertgebouworkest_loudness <- concertgebouworkest %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+concertgebouworkest_tempo <- concertgebouworkest %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+
+#royal liverpool orchestra charles mackerras
+royal_liverpool_orchestra_charles_mackerras_danceability <- royal_liverpool_orchestra_charles_mackerras %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+royal_liverpool_orchestra_charles_mackerras_energy <- royal_liverpool_orchestra_charles_mackerras %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+royal_liverpool_orchestra_charles_mackerras_loudness <- royal_liverpool_orchestra_charles_mackerras %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+royal_liverpool_orchestra_charles_mackerras_tempo <- royal_liverpool_orchestra_charles_mackerras %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#wolfgang sawallisch
+wolfgang_sawallisch_danceability <- wolfgang_sawallisch %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+wolfgang_sawallisch_energy <- wolfgang_sawallisch %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+wolfgang_sawallisch_loudness <- wolfgang_sawallisch %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+wolfgang_sawallisch_tempo <- wolfgang_sawallisch %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#cyprien katsaris
+cyprien_katsaris_danceability <- cyprien_katsaris %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+cyprien_katsaris_energy <- cyprien_katsaris %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+cyprien_katsaris_loudness <- cyprien_katsaris %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+cyprien_katsaris_tempo <- cyprien_katsaris %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#bach collegium japan
+bach_collegium_japan_danceability <- bach_collegium_japan %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+bach_collegium_japan_energy <- bach_collegium_japan %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+bach_collegium_japan_loudness <- bach_collegium_japan %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+bach_collegium_japan_tempo <- bach_collegium_japan %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#philharmonica orcestra herbert
+philharmonia_orchestra_herbert_danceability <- philharmonia_orchestra_herbert %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+philharmonia_orchestra_herbert_energy <- philharmonia_orchestra_herbert %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+philharmonia_orchestra_herbert_loudness <- philharmonia_orchestra_herbert %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+philharmonia_orchestra_herbert_tempo <- philharmonia_orchestra_herbert %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#wiener philharmoniker andris nelsons
+wiener_philharmoniker_andris_nelsons_danceability <- wiener_philharmoniker_andris_nelsons %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+wiener_philharmoniker_andris_nelsons_energy <- wiener_philharmoniker_andris_nelsons %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+wiener_philharmoniker_andris_nelsons_loudness <- wiener_philharmoniker_andris_nelsons %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+wiener_philharmoniker_andris_nelsons_tempo <- wiener_philharmoniker_andris_nelsons %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#london symphony orchestra bernard haitink
+london_symphony_orchestra_bernard_haitink_danceability <- london_symphony_orchestra_bernard_haitink %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+london_symphony_orchestra_bernard_haitink_energy <- london_symphony_orchestra_bernard_haitink %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+london_symphony_orchestra_bernard_haitink_loudness <- london_symphony_orchestra_bernard_haitink %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+london_symphony_orchestra_bernard_haitink_tempo <- london_symphony_orchestra_bernard_haitink %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#orchestra 18th century
+orchestra_18thcentury_danceability <- orchestra_18thcentury %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+orchestra_18thcentury_energy <- orchestra_18thcentury %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+orchestra_18thcentury_loudness <- orchestra_18thcentury %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+orchestra_18thcentury_tempo <- orchestra_18thcentury %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#osmo vanska
+osmo_vanska_danceability <- osmo_vanska %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+osmo_vanska_energy <- osmo_vanska %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+osmo_vanska_loudness <- osmo_vanska %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+osmo_vanska_tempo <- osmo_vanska %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+#london symphony orchestra josef krips
+london_symphony_orchestra_josef_krips_danceability <- london_symphony_orchestra_josef_krips %>% summarize(M_danceability = mean(danceability), SD_danceability = sd(danceability))
+london_symphony_orchestra_josef_krips_energy <- london_symphony_orchestra_josef_krips %>% summarize(M_energy = mean(energy), SD_energy = sd(energy))
+london_symphony_orchestra_josef_krips_loudness <- london_symphony_orchestra_josef_krips %>% summarize(M_loudness = mean(loudness), SD_loudness = sd(loudness))
+london_symphony_orchestra_josef_krips_tempo <- london_symphony_orchestra_josef_krips %>% summarize(M_tempo = mean(tempo), SD_tempo = sd(tempo))
+
+
+#danceability table
+all_symphonies_danceability <- bind_rows(
+  orchestre_revolutionaire_danceability, 
+  berliner_philharmoniker_danceability, 
+  andre_cuytens_danceability, 
+  sarah_walker_danceability, 
+  gustavo_dudamel_danceability, 
+  wiener_philharmoniker_danceability, 
+  arturo_toscanini_danceability, 
+  jonas_ferencsik_danceability, 
+  london_symphony_danceability, 
+  zagreb_philharmonic_danceability, 
+  jananeck_opera_danceability, 
+  orquesta_sinfonica_mineria_danceability, 
+  berliner_philharmoniker_herbert_danceability, 
+  wilhelm_furtwangler_danceability, 
+  gewandhausorchester_leipzig_danceability, 
+  nikolaus_harnoncourt_danceability, 
+  simon_rattle_danceability, 
+  tafelmusik_baroque_orchestra_danceability, 
+  berliner_philharmoniker_herbert2_danceability, 
+  janet_perry_danceability, 
+  bavarian_radio_symphony_orchestra_danceability, 
+  wiener_philharmoniker_leonard_danceability, 
+  hans_schmidt_isserstedt_danceability, 
+  herbert_von_karajan_danceability, 
+  simon_rattle2_danceability, 
+  concertgebouworkest_danceability, 
+  royal_liverpool_orchestra_charles_mackerras_danceability, 
+  wolfgang_sawallisch_danceability, 
+  cyprien_katsaris_danceability, 
+  bach_collegium_japan_danceability, 
+  philharmonia_orchestra_herbert_danceability, 
+  wiener_philharmoniker_andris_nelsons_danceability, 
+  london_symphony_orchestra_bernard_haitink_danceability, 
+  orchestra_18thcentury_danceability, 
+  osmo_vanska_danceability, 
+  london_symphony_orchestra_josef_krips_danceability
+)
+
+all_symphonies_danceability$version <- c('orchestre_revolutionaire', 
+                            'berliner_philharmoniker', 
+                            'andre_cuytens', 
+                            'sarah_walker', 
+                            'gustavo_dudamel', 
+                            'wiener_philharmoniker', 
+                            'arturo_toscanini', 
+                            'jonas_ferencsik', 
+                            'london_symphony', 
+                            'zagreb_philharmonic', 
+                            'jananeck_opera', 
+                            'orquesta_sinfonica_mineria', 
+                            'berliner_philharmoniker_herbert', 
+                            'wilhelm_furtwangler', 
+                            'gewandhausorchester_leipzig', 
+                            'nikolaus_harnoncourt', 
+                            'simon_rattle', 
+                            'tafelmusik_baroque_orchestra', 
+                            'berliner_philharmoniker_herbert2', 
+                            'janet_perry', 
+                            'bavarian_radio_symphony_orchestra', 
+                            'wiener_philharmoniker_leonard', 
+                            'hans_schmidt_isserstedt', 
+                            'herbert_von_karajan', 
+                            'simon_rattle2', 
+                            'concertgebouworkest', 
+                            'royal_liverpool_orchestra_charles_mackerras', 
+                            'wolfgang_sawallisch', 
+                            'cyprien_katsaris', 
+                            'bach_collegium_japan', 
+                            'philharmonia_orchestra_herbert', 
+                            'wiener_philharmoniker_andris_nelsons', 
+                            'london_symphony_orchestra_bernard_haitink', 
+                            'orchestra_18thcentury', 
+                            'osmo_vanska', 
+                            'london_symphony_orchestra_josef_krips')
+
+#energy table
+all_symphonies_energy <- bind_rows(
+  orchestre_revolutionaire_energy, 
+  berliner_philharmoniker_energy, 
+  andre_cuytens_energy, 
+  sarah_walker_energy, 
+  gustavo_dudamel_energy, 
+  wiener_philharmoniker_energy, 
+  arturo_toscanini_energy, 
+  jonas_ferencsik_energy, 
+  london_symphony_energy, 
+  zagreb_philharmonic_energy, 
+  jananeck_opera_energy, 
+  orquesta_sinfonica_mineria_energy, 
+  berliner_philharmoniker_herbert_energy, 
+  wilhelm_furtwangler_energy, 
+  gewandhausorchester_leipzig_energy, 
+  nikolaus_harnoncourt_energy, 
+  simon_rattle_energy, 
+  tafelmusik_baroque_orchestra_energy, 
+  berliner_philharmoniker_herbert2_energy,  
+  janet_perry_energy, 
+  bavarian_radio_symphony_orchestra_energy, 
+  wiener_philharmoniker_leonard_energy, 
+  hans_schmidt_isserstedt_energy, 
+  herbert_von_karajan_energy, 
+  simon_rattle2_energy, 
+  concertgebouworkest_energy, 
+  royal_liverpool_orchestra_charles_mackerras_energy, 
+  wolfgang_sawallisch_energy, 
+  cyprien_katsaris_energy, 
+  bach_collegium_japan_energy, 
+  philharmonia_orchestra_herbert_energy, 
+  wiener_philharmoniker_andris_nelsons_energy, 
+  london_symphony_orchestra_bernard_haitink_energy, 
+  orchestra_18thcentury_energy, 
+  osmo_vanska_energy, 
+  london_symphony_orchestra_josef_krips_energy
+)
+
+all_symphonies_energy$version <- c('orchestre_revolutionaire', 
+                                         'berliner_philharmoniker', 
+                                         'andre_cuytens', 
+                                         'sarah_walker', 
+                                         'gustavo_dudamel', 
+                                         'wiener_philharmoniker', 
+                                         'arturo_toscanini', 
+                                         'jonas_ferencsik', 
+                                         'london_symphony', 
+                                         'zagreb_philharmonic', 
+                                         'jananeck_opera', 
+                                         'orquesta_sinfonica_mineria', 
+                                         'berliner_philharmoniker_herbert', 
+                                         'wilhelm_furtwangler', 
+                                         'gewandhausorchester_leipzig', 
+                                         'nikolaus_harnoncourt', 
+                                         'simon_rattle', 
+                                         'tafelmusik_baroque_orchestra', 
+                                         'berliner_philharmoniker_herbert2', 
+                                         'janet_perry', 
+                                         'bavarian_radio_symphony_orchestra', 
+                                         'wiener_philharmoniker_leonard', 
+                                         'hans_schmidt_isserstedt', 
+                                         'herbert_von_karajan', 
+                                         'simon_rattle2', 
+                                         'concertgebouworkest', 
+                                         'royal_liverpool_orchestra_charles_mackerras', 
+                                         'wolfgang_sawallisch', 
+                                         'cyprien_katsaris', 
+                                         'bach_collegium_japan', 
+                                         'philharmonia_orchestra_herbert', 
+                                         'wiener_philharmoniker_andris_nelsons', 
+                                         'london_symphony_orchestra_bernard_haitink', 
+                                         'orchestra_18thcentury', 
+                                         'osmo_vanska', 
+                                         'london_symphony_orchestra_josef_krips')
+
+
+#loudness table
+all_symphonies_loudness <- bind_rows(
+  orchestre_revolutionaire_loudness, 
+  berliner_philharmoniker_loudness, 
+  andre_cuytens_loudness, 
+  sarah_walker_loudness, 
+  gustavo_dudamel_loudness, 
+  wiener_philharmoniker_loudness, 
+  arturo_toscanini_loudness, 
+  jonas_ferencsik_loudness, 
+  london_symphony_loudness, 
+  zagreb_philharmonic_loudness, 
+  jananeck_opera_loudness, 
+  orquesta_sinfonica_mineria_loudness, 
+  berliner_philharmoniker_herbert_loudness, 
+  wilhelm_furtwangler_loudness, 
+  gewandhausorchester_leipzig_loudness, 
+  nikolaus_harnoncourt_loudness, 
+  simon_rattle_loudness, 
+  tafelmusik_baroque_orchestra_loudness, 
+  berliner_philharmoniker_herbert2_loudness, 
+  janet_perry_loudness, 
+  bavarian_radio_symphony_orchestra_loudness, 
+  wiener_philharmoniker_leonard_loudness, 
+  hans_schmidt_isserstedt_loudness, 
+  herbert_von_karajan_loudness, 
+  simon_rattle2_loudness, 
+  concertgebouworkest_loudness, 
+  royal_liverpool_orchestra_charles_mackerras_loudness, 
+  wolfgang_sawallisch_loudness, 
+  cyprien_katsaris_loudness, 
+  bach_collegium_japan_loudness, 
+  philharmonia_orchestra_herbert_loudness, 
+  wiener_philharmoniker_andris_nelsons_loudness, 
+  london_symphony_orchestra_bernard_haitink_loudness, 
+  orchestra_18thcentury_loudness, 
+  osmo_vanska_loudness, 
+  london_symphony_orchestra_josef_krips_loudness)
+
+all_symphonies_loudness$version <- c('orchestre_revolutionaire', 
+                                         'berliner_philharmoniker', 
+                                         'andre_cuytens', 
+                                         'sarah_walker', 
+                                         'gustavo_dudamel', 
+                                         'wiener_philharmoniker', 
+                                         'arturo_toscanini', 
+                                         'jonas_ferencsik', 
+                                         'london_symphony', 
+                                         'zagreb_philharmonic', 
+                                         'jananeck_opera', 
+                                         'orquesta_sinfonica_mineria', 
+                                         'berliner_philharmoniker_herbert', 
+                                         'wilhelm_furtwangler', 
+                                         'gewandhausorchester_leipzig', 
+                                         'nikolaus_harnoncourt', 
+                                         'simon_rattle', 
+                                         'tafelmusik_baroque_orchestra', 
+                                         'berliner_philharmoniker_herbert2', 
+                                         'janet_perry', 
+                                         'bavarian_radio_symphony_orchestra', 
+                                         'wiener_philharmoniker_leonard', 
+                                         'hans_schmidt_isserstedt', 
+                                         'herbert_von_karajan', 
+                                         'simon_rattle2', 
+                                         'concertgebouworkest', 
+                                         'royal_liverpool_orchestra_charles_mackerras', 
+                                         'wolfgang_sawallisch', 
+                                         'cyprien_katsaris', 
+                                         'bach_collegium_japan', 
+                                         'philharmonia_orchestra_herbert', 
+                                         'wiener_philharmoniker_andris_nelsons', 
+                                         'london_symphony_orchestra_bernard_haitink', 
+                                         'orchestra_18thcentury', 
+                                         'osmo_vanska', 
+                                         'london_symphony_orchestra_josef_krips')
+
+
+#tempo table
+all_symphonies_tempo <- bind_rows(
+  orchestre_revolutionaire_tempo, 
+  berliner_philharmoniker_tempo, 
+  andre_cuytens_tempo, 
+  sarah_walker_tempo, 
+  gustavo_dudamel_tempo, 
+  wiener_philharmoniker_tempo, 
+  arturo_toscanini_tempo, 
+  jonas_ferencsik_tempo, 
+  london_symphony_tempo, 
+  zagreb_philharmonic_tempo, 
+  jananeck_opera_tempo, 
+  orquesta_sinfonica_mineria_tempo,  
+  berliner_philharmoniker_herbert_tempo, 
+  wilhelm_furtwangler_tempo, 
+  gewandhausorchester_leipzig_tempo, 
+  nikolaus_harnoncourt_tempo, 
+  simon_rattle_tempo, 
+  tafelmusik_baroque_orchestra_tempo, 
+  berliner_philharmoniker_herbert2_tempo, 
+  janet_perry_tempo, 
+  bavarian_radio_symphony_orchestra_tempo, 
+  wiener_philharmoniker_leonard_tempo, 
+  hans_schmidt_isserstedt_tempo, 
+  herbert_von_karajan_tempo, 
+  simon_rattle2_tempo, 
+  concertgebouworkest_tempo, 
+  royal_liverpool_orchestra_charles_mackerras_tempo, 
+  wolfgang_sawallisch_tempo, 
+  cyprien_katsaris_tempo, 
+  bach_collegium_japan_tempo, 
+  philharmonia_orchestra_herbert_tempo, 
+  wiener_philharmoniker_andris_nelsons_tempo, 
+  london_symphony_orchestra_bernard_haitink_tempo, 
+  orchestra_18thcentury_tempo, 
+  osmo_vanska_tempo, 
+  london_symphony_orchestra_josef_krips_tempo
+)
+
+
+all_symphonies_tempo$version <- c('orchestre_revolutionaire', 
+                                         'berliner_philharmoniker', 
+                                         'andre_cuytens', 
+                                         'sarah_walker', 
+                                         'gustavo_dudamel', 
+                                         'wiener_philharmoniker', 
+                                         'arturo_toscanini', 
+                                         'jonas_ferencsik', 
+                                         'london_symphony', 
+                                         'zagreb_philharmonic', 
+                                         'jananeck_opera', 
+                                         'orquesta_sinfonica_mineria', 
+                                         'berliner_philharmoniker_herbert', 
+                                         'wilhelm_furtwangler', 
+                                         'gewandhausorchester_leipzig', 
+                                         'nikolaus_harnoncourt', 
+                                         'simon_rattle', 
+                                         'tafelmusik_baroque_orchestra', 
+                                         'berliner_philharmoniker_herbert2', 
+                                         'janet_perry', 
+                                         'bavarian_radio_symphony_orchestra', 
+                                         'wiener_philharmoniker_leonard', 
+                                         'hans_schmidt_isserstedt', 
+                                         'herbert_von_karajan', 
+                                         'simon_rattle2', 
+                                         'concertgebouworkest', 
+                                         'royal_liverpool_orchestra_charles_mackerras', 
+                                         'wolfgang_sawallisch', 
+                                         'cyprien_katsaris', 
+                                         'bach_collegium_japan', 
+                                         'philharmonia_orchestra_herbert', 
+                                         'wiener_philharmoniker_andris_nelsons', 
+                                         'london_symphony_orchestra_bernard_haitink', 
+                                         'orchestra_18thcentury', 
+                                         'osmo_vanska', 
+                                         'london_symphony_orchestra_josef_krips')
+
+
+all_symphonies_features <- bind_rows(all_symphonies_tempo, 
+          all_symphonies_loudness, 
+          all_symphonies_danceability, 
+          all_symphonies_energy)
+
+
+
+
+all_symphonies_features2 <- merge(
+  all_symphonies_danceability, 
+  all_symphonies_energy, 
+  by = "version"
+)
+
+all_symphonies_features1 <- merge(
+  all_symphonies_features2, 
+  all_symphonies_loudness, 
+  by = "version"
+)
+
+all_symphonies_features <- merge(
+  all_symphonies_features1, 
+  all_symphonies_tempo, 
+  by = "version"
+)
 ```
 
-### Title. Make it long and interesting, think like a journalist.
+### Beethoven's ninth; an iconic symphony. What are the differences between different versions of this symphony?
 
-This is introductory text, here goes code for visualizations or boring text. 
-The plots you need to give a name and put in the command ggplotly() -> The plot becomes interactive. 
+Beethoven's ninth, a piece commonly known, can have a lot of different meanings for different persons. Some people only find the music soothing and beautiful, while other people use it as an identifier, since it's the anthem of the European Union. Considering this year has brought us Brexit and realising that Beethoven was born 250 years ago this year, gave me a good reason to investigate this masterpiece of a symphony.
+On Spotify there are countless different versions of this piece. All performed by different conductors with different orchestras. I wanna know what the differences are between these versions. Performing a classical piece like this one doesn't come with a lot of freedom in interpretation. I wonder whether Spotify statistics are able to identify the small differences between versions. 
+To investigate this i implemented the data of 36 different versions in R. The features i used are danceability, energy, loudness and tempo. Danceability might seem strange in the context of a symphony, however in my research i use it not to measure how 'danceable' a track actually is, but to add a variable to my comparison to get a better view of the symphony as a whole. I think the way Spotify constructs the danceability feature and especialy the different elements they look at are interesting enough to use in my research. The next feature is energy. With this feature i try to measure the activity and intensity between the different versions. I'm also gonna measure the loudness of the different versions. Loudness is less of an identifier in my research but it could make differences or similarities between the different versions more conclusive. The last feature i used is tempo. This feature analyses the song by bpm. Spotify takes the mean of the tempo throughout the song. This could result in slightly incorrect data, since the symphony contains a lot of tempo changes. Nevertheless i think it can be very useful in drawing a comparison between the different versions. 
 
 ***
 
-This is the text in the right side piece. This is the place for your description.
+```{r, out.width = "300px"}
+knitr::include_graphics("Beethoven.jpg")
+```
+*Ludwig van Beethoven, by  Joseph Karl Stieler, 1820*
 
-### This is the second piece of story, also use a long title here. 
+
+### How does one analyse all these features of the same symphony and compare them to each other?
+
+**To better analyse the different versions of the symphonies i took the means and standard deviations of the features of the symphonies. Below you see a table with all those variables.**
 
 
+```{r}
+  
+datatable(all_symphonies_features, rownames = FALSE, 
+          options = list(
+            searching = FALSE
+          )) %>% formatRound(c(
+              'M_danceability', 
+              'SD_danceability', 
+              'M_tempo', 
+              'SD_tempo', 
+              'M_loudness', 
+              'SD_loudness', 
+              'M_energy', 
+              'SD_energy'), 
+              3)
+```
 
-### Chart A
+***
+
+This table is of course a very raw one and it's hard to draw any conclusions from it. We can play around with the ordering function a bit, to see which of the versions excels at certain features, but it's not possible to spot any correlation between different versions. 
+
+
+### How to prove correlations: The truth is in the graph
+
 
 ```{r}
 
+tempo_plot <- ggplot(all_symphonies_features, aes(
+    x = version, 
+    y = M_tempo, 
+    fill = SD_tempo
+    )) + 
+  geom_bar(
+    stat = "identity"
+  ) +   coord_flip() + 
+  labs(
+    x = "Version of the Symphony",
+    y = "Tempo (BPM)", 
+    title = "The difference in tempo among the different versions of the symphony",
+    caption = "Data source: Spotify's API, 2020") + 
+  theme(
+    title = element_text(size = 5), 
+    text = element_text(color = 'gray30'), 
+    )
+
+tempo_plot
 ```
 
-Column {data-width=350}
------------------------------------------------------------------------
+***
 
-### Chart B
+Here is an example of a bar graph considering the difference in tempo between the different versions. Also the standard deviations of the tempo of the different versions is implemented in the graph. 
+This graph shows a lot more than the table that we saw before. There is a clear variety between the different versions. Also there are some outliers like the version by Hans Schmidt Isserstedt, The London Symphony Orchestra with Bernard Haitink and the one by Tafelmusik Baroque Orchestra. 
 
-```{r}
-
-```
-
-### Chart C
-
-```{r}
-
-```
 
