@@ -919,27 +919,3 @@ h_s_i_chords %>%
 
 These two graphs compare the similarities in key between the two outliers, the version by Tafelmusik Baroque Orchestra and by Hans Schmidt Isserstedt. As is to be expected the graphs are very similar. However the version by the Tafelmusik Baroque Orchestra has a higher tempo then the one by Hans Schmidt Isserstedt. Also the one by Tafelmusik seems to be a lot more diffuse, soundwise. The different keys are not as clear as the version of Isserstedt. I can't really find any explanation for these results in the data from both versions. Also when i listen to the versions i can't hear a clear difference. 
 
-### Practice with cluster analysis
-
-```{r}
-beethoven_playlist <- 
-    get_playlist_audio_features('spotify', '37i9dQZF1DX12YIlzNkccL') %>% 
-    add_audio_analysis %>% 
-    mutate(
-        segments = 
-            map2(segments, key, compmus_c_transpose)) %>% 
-    mutate(
-        pitches = 
-            map(segments, 
-                compmus_summarise, pitches, 
-                method = 'mean', norm = 'manhattan'),
-        timbre =
-            map(
-                segments,
-                compmus_summarise, timbre,
-                method = 'mean')) %>% 
-    mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
-    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
-    unnest(cols = c(pitches, timbre))
-```
-
