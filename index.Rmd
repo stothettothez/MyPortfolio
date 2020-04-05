@@ -9,7 +9,12 @@ output:
 ```{r setup, include = FALSE}
 library(flexdashboard)
 library(ggplot2)
+library(compmus)
 library(tidyverse)
+library(tidymodels)
+library(protoclust)
+library(ggdendro)
+library(heatmaply)
 library(plotly)
 library(spotifyr)
 library(knitr)
@@ -648,6 +653,7 @@ all_symphonies_features <- merge(
 )
 ```
 
+
 ### Beethoven's ninth; an iconic symphony. What are the differences between different versions of this symphony?
 
 Beethoven's ninth, a piece commonly known, can have a lot of different meanings for different persons. Some people only find the music soothing and beautiful, while other people use it as an identifier, since it's the anthem of the European Union. Considering this year has brought us Brexit and realising that Beethoven was born 250 years ago this year, gave me a good reason to investigate this masterpiece of a symphony.
@@ -707,6 +713,7 @@ tempo_plot <- ggplot(all_symphonies_features, aes(
     y = "Tempo (BPM)", 
     title = "The difference in tempo among the different versions of the symphony",
     caption = "Data source: Spotify's API, 2020") + 
+  scale_fill_viridis_c(option = 'E') + 
   theme(
     title = element_text(size = 5), 
     text = element_text(color = 'gray30'), 
@@ -719,3 +726,220 @@ tempo_plot
 
 Here is an example of a bar graph considering the difference in tempo between the different versions. Also the standard deviations of the tempo of the different versions is implemented in the graph. 
 This graph shows a lot more than the table that we saw before. There is a clear variety between the different versions. Also there are some outliers like the version by Hans Schmidt Isserstedt, The London Symphony Orchestra with Bernard Haitink and the one by Tafelmusik Baroque Orchestra. 
+
+### How do the outliers from the previous slides compare, considering timbre?
+
+```{r}
+t_b_o <- 
+    get_tidy_audio_analysis('6QaY7XjB8x9Y84CxmL2GvG') %>% 
+    compmus_align(beats, segments) %>% 
+    select(beats) %>% unnest(beats) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'rms', norm = 'euclidean')) %>% 
+    mutate(
+        timbre = 
+            map(segments, 
+                compmus_summarise, timbre, 
+                method = 'rms', norm = 'euclidean'))
+
+t_b_o %>% 
+    compmus_gather_timbre %>% 
+    ggplot(
+        aes(
+            x = start + duration / 2, 
+            width = duration, 
+            y = basis, 
+            fill = value)) + 
+    geom_tile() +
+    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude', title = 'Tafelmusik Baroque Orchestra') +
+    scale_fill_viridis_c(option = 'E') +
+    theme_classic()
+
+h_s_i <- 
+    get_tidy_audio_analysis('6KOYxFZT5NTwW7ObxwVmrX') %>% 
+    compmus_align(beats, segments) %>% 
+    select(beats) %>% unnest(beats) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'rms', norm = 'euclidean')) %>% 
+    mutate(
+        timbre = 
+            map(segments, 
+                compmus_summarise, timbre, 
+                method = 'rms', norm = 'euclidean'))
+
+h_s_i %>% 
+    compmus_gather_timbre %>% 
+    ggplot(
+        aes(
+            x = start + duration / 2, 
+            width = duration, 
+            y = basis, 
+            fill = value)) + 
+    geom_tile() +
+    labs(x = 'Time (s)', y = NULL, fill = 'Magnitude', title = 'Hans Schmidt Isserstedt') +
+    scale_fill_viridis_c(option = 'E') +
+    theme_classic()
+```
+
+***
+
+Shown here are the two cepstograms from the outliers. From this graph there is not much difference to notice. An explanation could be that the orchestra's were very like-minded considering timbre. Another explanation could be that there are certain standards attached to recording an orchestra and that the differences in interpretation are not hearable. 
+
+
+### Key and Chord estimations: Do all orchestra's follow Beethoven's sheet music?
+```{r}
+circshift <- function(v, n) {if (n == 0) v else c(tail(v, n), head(v, -n))}
+
+# C     C#    D     Eb    E     F     F#    G     Ab    A     Bb    B 
+major_chord <- 
+  c(1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    0,    0)
+minor_chord <- 
+  c(1,    0,    0,    1,    0,    0,    0,    1,    0,    0,    0,    0)
+seventh_chord <- 
+  c(1,    0,    0,    0,    1,    0,    0,    1,    0,    0,    1,    0)
+
+major_key <- 
+  c(6.35, 2.23, 3.48, 2.33, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88)
+minor_key <-
+  c(6.33, 2.68, 3.52, 5.38, 2.60, 3.53, 2.54, 4.75, 3.98, 2.69, 3.34, 3.17)
+
+chord_templates <-
+  tribble(
+    ~name  , ~template,
+    'Gb:7'  , circshift(seventh_chord,  6),
+    'Gb:maj', circshift(major_chord,    6),
+    'Bb:min', circshift(minor_chord,   10),
+    'Db:maj', circshift(major_chord,    1),
+    'F:min' , circshift(minor_chord,    5),
+    'Ab:7'  , circshift(seventh_chord,  8),
+    'Ab:maj', circshift(major_chord,    8),
+    'C:min' , circshift(minor_chord,    0),
+    'Eb:7'  , circshift(seventh_chord,  3),
+    'Eb:maj', circshift(major_chord,    3),
+    'G:min' , circshift(minor_chord,    7),
+    'Bb:7'  , circshift(seventh_chord, 10),
+    'Bb:maj', circshift(major_chord,   10),
+    'D:min' , circshift(minor_chord,    2),
+    'F:7'   , circshift(seventh_chord,  5),
+    'F:maj' , circshift(major_chord,    5),
+    'A:min' , circshift(minor_chord,    9),
+    'C:7'   , circshift(seventh_chord,  0),
+    'C:maj' , circshift(major_chord,    0),
+    'E:min' , circshift(minor_chord,    4),
+    'G:7'   , circshift(seventh_chord,  7),
+    'G:maj' , circshift(major_chord,    7),
+    'B:min' , circshift(minor_chord,   11),
+    'D:7'   , circshift(seventh_chord,  2),
+    'D:maj' , circshift(major_chord,    2),
+    'F#:min', circshift(minor_chord,    6),
+    'A:7'   , circshift(seventh_chord,  9),
+    'A:maj' , circshift(major_chord,    9),
+    'C#:min', circshift(minor_chord,    1),
+    'E:7'   , circshift(seventh_chord,  4),
+    'E:maj' , circshift(major_chord,    4),
+    'G#:min', circshift(minor_chord,    8),
+    'B:7'   , circshift(seventh_chord, 11),
+    'B:maj' , circshift(major_chord,   11),
+    'D#:min', circshift(minor_chord,    3))
+
+key_templates <-
+  tribble(
+    ~name    , ~template,
+    'Gb:maj', circshift(major_key,  6),
+    'Bb:min', circshift(minor_key, 10),
+    'Db:maj', circshift(major_key,  1),
+    'F:min' , circshift(minor_key,  5),
+    'Ab:maj', circshift(major_key,  8),
+    'C:min' , circshift(minor_key,  0),
+    'Eb:maj', circshift(major_key,  3),
+    'G:min' , circshift(minor_key,  7),
+    'Bb:maj', circshift(major_key, 10),
+    'D:min' , circshift(minor_key,  2),
+    'F:maj' , circshift(major_key,  5),
+    'A:min' , circshift(minor_key,  9),
+    'C:maj' , circshift(major_key,  0),
+    'E:min' , circshift(minor_key,  4),
+    'G:maj' , circshift(major_key,  7),
+    'B:min' , circshift(minor_key, 11),
+    'D:maj' , circshift(major_key,  2),
+    'F#:min', circshift(minor_key,  6),
+    'A:maj' , circshift(major_key,  9),
+    'C#:min', circshift(minor_key,  1),
+    'E:maj' , circshift(major_key,  4),
+    'G#:min', circshift(minor_key,  8),
+    'B:maj' , circshift(major_key, 11),
+    'D#:min', circshift(minor_key,  3))
+
+t_b_o_chords <- 
+    get_tidy_audio_analysis('6QaY7XjB8x9Y84CxmL2GvG') %>% 
+    compmus_align(sections, segments) %>% 
+    select(sections) %>% unnest(sections) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'))
+
+t_b_o_chords %>% 
+    compmus_match_pitch_template(key_templates, 'euclidean', 'manhattan') %>% 
+    ggplot(
+        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
+    geom_tile() +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    theme_minimal() +
+    labs(x = 'Time (s)', y = '', title = 'Tafelmusik Baroque Orchestra')
+
+h_s_i_chords <- 
+    get_tidy_audio_analysis('6KOYxFZT5NTwW7ObxwVmrX') %>% 
+    compmus_align(sections, segments) %>% 
+    select(sections) %>% unnest(sections) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'))
+
+h_s_i_chords %>% 
+    compmus_match_pitch_template(key_templates, 'euclidean', 'manhattan') %>% 
+    ggplot(
+        aes(x = start + duration / 2, width = duration, y = name, fill = d)) +
+    geom_tile() +
+    scale_fill_viridis_c(option = 'E', guide = 'none') +
+    theme_minimal() +
+    labs(x = 'Time (s)', y = '', title = 'Hans Schmidt Isserstedt')
+```
+
+***
+
+These two graphs compare the similarities in key between the two outliers, the version by Tafelmusik Baroque Orchestra and by Hans Schmidt Isserstedt. As is to be expected the graphs are very similar. However the version by the Tafelmusik Baroque Orchestra has a higher tempo then the one by Hans Schmidt Isserstedt. Also the one by Tafelmusik seems to be a lot more diffuse, soundwise. The different keys are not as clear as the version of Isserstedt. I can't really find any explanation for these results in the data from both versions. Also when i listen to the versions i can't hear a clear difference. 
+
+### Practice with cluster analysis
+
+```{r}
+beethoven_playlist <- 
+    get_playlist_audio_features('spotify', '37i9dQZF1DX12YIlzNkccL') %>% 
+    add_audio_analysis %>% 
+    mutate(
+        segments = 
+            map2(segments, key, compmus_c_transpose)) %>% 
+    mutate(
+        pitches = 
+            map(segments, 
+                compmus_summarise, pitches, 
+                method = 'mean', norm = 'manhattan'),
+        timbre =
+            map(
+                segments,
+                compmus_summarise, timbre,
+                method = 'mean')) %>% 
+    mutate(pitches = map(pitches, compmus_normalise, 'clr')) %>% 
+    mutate_at(vars(pitches, timbre), map, bind_rows) %>% 
+    unnest(cols = c(pitches, timbre))
+```
+
